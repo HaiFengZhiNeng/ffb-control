@@ -62,6 +62,7 @@
                 android:layout_marginLeft="6dp"
                 android:background="@null"
                 android:hint="用户名"
+                android:text="hotel003"
                 android:inputType="textEmailAddress|text"
                 android:textSize="16sp" />
 
@@ -86,6 +87,7 @@
                 android:layout_marginLeft="6dp"
                 android:background="@null"
                 android:hint="密码"
+                android:text="1234567890"
                 android:inputType="textPassword"
                 android:textSize="16sp" />
 

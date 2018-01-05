@@ -23,6 +23,7 @@ import com.example.ffbclient.R;
 import com.example.ffbclient.common.Constants;
 import com.example.ffbclient.common.IMBaseActivity;
 import com.example.ffbclient.common.RobotType;
+import com.example.ffbclient.common.UserManage;
 import com.example.ffbclient.db.manager.VoiceDbManager;
 import com.example.ffbclient.model.RobotBean;
 import com.example.ffbclient.model.VoiceBean;
@@ -40,7 +41,6 @@ import com.example.ffbclient.utils.GsonUtil;
 import com.example.ffbclient.utils.PhoneUtil;
 import com.example.ffbclient.utils.PreferencesUtils;
 import com.seabreeze.log.Print;
-import com.seabreeze.log.User;
 import com.tencent.TIMConversationType;
 import com.tencent.TIMMessage;
 import com.tencent.callsdk.ILVCallConfig;
@@ -141,8 +141,6 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     RelativeLayout mMessage;
     @BindView(R.id.btn_switch_chat_mode)
     Button btnSWithChatMode;
-    @BindView(R.id.btn_switch_chat_robot)
-    Button btnSwithChatRobot;
 
     private MainPresenter mPresenter;
     private ChatPresenter mChatPresenter;
@@ -196,9 +194,8 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     @Override
     protected void initView() {
         mPresenter = new MainPresenter(this);
-        mChatPresenter = new ChatPresenter(this, TIMConversationType.C2C, User.robotName);
+        mChatPresenter = new ChatPresenter(this, TIMConversationType.C2C, UserManage.getInstance().getRobotName());
         mChatPresenter.start();
-        btnSwithChatRobot.setText(User.robotName);
 
         Constants.IP = PhoneUtil.getWifiIP(FfbClientApp.getInstance());
 
@@ -266,7 +263,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
             R.id.change_text_voice, R.id.repeat_imageView, R.id.relink_imageView, R.id.voice_btn, R.id.localView_imageView,
             R.id.btn_cancel_video, R.id.video_btn_accept, R.id.video_btn_relese, R.id.openSurface_imageView,
             R.id.controlSetting_imageView, R.id.message_relative, R.id.hideInput_iv, R.id.voicePeople_imageview,
-            R.id.btn_switch_chat_mode, R.id.btn_switch_chat_robot})
+            R.id.btn_switch_chat_mode})
     void onClick(View view) {
         fullScreen();
         switch (view.getId()) {
@@ -329,19 +326,10 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
             case R.id.btn_switch_chat_mode:
                 if (mChatPresenter.getConversation().getType() == TIMConversationType.C2C) {
                     btnSWithChatMode.setText("单聊");
-                    mChatPresenter.switchChatMode(TIMConversationType.Group, User.roomAVId);
+                    mChatPresenter.switchChatMode(TIMConversationType.Group, UserManage.roomAVId);
                 } else {
-                    mChatPresenter.switchChatMode(TIMConversationType.C2C, User.robotName);
+                    mChatPresenter.switchChatMode(TIMConversationType.C2C, UserManage.getInstance().getRobotName());
                     btnSWithChatMode.setText("群聊");
-                }
-                break;
-            case R.id.btn_switch_chat_robot:
-                if (btnSwithChatRobot.getText().toString().equals(User.robotName)) {
-                    btnSwithChatRobot.setText(User.robotNameOther);
-                    mChatPresenter.switchChatMode(TIMConversationType.C2C, User.robotNameOther);
-                } else {
-                    btnSwithChatRobot.setText(User.robotName);
-                    mChatPresenter.switchChatMode(TIMConversationType.C2C, User.robotName);
                 }
                 break;
             default:

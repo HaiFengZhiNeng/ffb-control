@@ -3,14 +3,15 @@ package com.example.ffbclient.presenter;
 import android.util.Log;
 
 import com.example.ffbclient.common.RobotType;
+import com.example.ffbclient.common.UserManage;
 import com.example.ffbclient.im.event.MessageEvent;
 import com.example.ffbclient.im.event.RefreshEvent;
 import com.example.ffbclient.model.RobotBean;
+import com.example.ffbclient.model.UserInfo;
 import com.example.ffbclient.presenter.ipresenter.IChatPresenter;
 import com.example.ffbclient.utils.BitmapUtils;
 import com.example.ffbclient.utils.GsonUtil;
 import com.seabreeze.log.Print;
-import com.seabreeze.log.User;
 import com.tencent.TIMCallBack;
 import com.tencent.TIMConversation;
 import com.tencent.TIMConversationType;
@@ -87,7 +88,7 @@ public class ChatPresenter extends IChatPresenter implements Observer {
     @Override
     public void createGroup(String roomId) {
         ArrayList<String> list = new ArrayList<>();
-        list.add(User.robotName);
+        list.add(UserManage.getInstance().getRobotName());
 //        TIMGroupManager.getInstance().createGroup("Private", list, roomId, new TIMValueCallBack<String>() {
 //            @Override
 //            public void onError(int code, String s) {
@@ -119,7 +120,7 @@ public class ChatPresenter extends IChatPresenter implements Observer {
 
     @Override
     public void createGroupParam(String roomId) {
-        TIMGroupManager.CreateGroupParam param = TIMGroupManager.getInstanceById(User.clientName).new CreateGroupParam();
+        TIMGroupManager.CreateGroupParam param = TIMGroupManager.getInstanceById(UserInfo.getInstance().getIdentifier()).new CreateGroupParam();
         param.setGroupType("Private");
         param.setGroupName(roomId);
         param.setIntroduction("hello haifeng");
@@ -128,7 +129,7 @@ public class ChatPresenter extends IChatPresenter implements Observer {
         //添加群成员
         List<TIMGroupMemberInfo> infos = new ArrayList<TIMGroupMemberInfo>();
         TIMGroupMemberInfo member = new TIMGroupMemberInfo();
-        member.setUser(User.robotName);
+        member.setUser(UserManage.getInstance().getRobotName());
         member.setRoleType(TIMGroupMemberRoleType.NotMember);
         infos.add(member);
         param.setMembers(infos);
@@ -150,7 +151,7 @@ public class ChatPresenter extends IChatPresenter implements Observer {
     public void inviteGroup(String roomId) {
         //创建待加入群组的用户列表
         ArrayList<String> list = new ArrayList<>();
-        list.add(User.robotName);
+        list.add(UserManage.getInstance().getRobotName());
         TIMGroupManager.getInstance().inviteGroupMember(roomId, list, new TIMValueCallBack<List<TIMGroupMemberResult>>() {
             @Override
             public void onError(int i, String s) {

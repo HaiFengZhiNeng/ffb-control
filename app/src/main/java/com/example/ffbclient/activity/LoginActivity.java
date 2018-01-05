@@ -20,11 +20,11 @@ import android.widget.TextView;
 
 import com.example.ffbclient.R;
 import com.example.ffbclient.common.BaseActivity;
+import com.example.ffbclient.common.UserManage;
 import com.example.ffbclient.model.UserInfo;
 import com.example.ffbclient.presenter.LoginPresenter;
 import com.example.ffbclient.presenter.ipresenter.ILoginPresenter;
 import com.seabreeze.log.Print;
-import com.seabreeze.log.User;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -89,7 +89,7 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-        User.robotName = User.robotName001;
+        UserManage.getInstance().setRobotName(UserManage.robotName001);
     }
 
     @Override
@@ -267,10 +267,10 @@ public class LoginActivity extends BaseActivity implements ILoginPresenter.ILogi
     public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
         switch (checkedId) {
             case R.id.robot01:
-                User.robotName = User.robotName001;
+                UserManage.getInstance().setRobotName(UserManage.robotName001);
                 break;
             case R.id.robot02:
-                User.robotName = User.robotName002;
+                UserManage.getInstance().setRobotName(UserManage.robotName002);
                 break;
         }
     }
