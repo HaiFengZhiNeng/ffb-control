@@ -63,6 +63,7 @@ public class UdpService extends Service implements OnListenerUDPServer {
 
     @Override
     public void onDestroy() {
+        netClient.unRegisterUdpClient();
         super.onDestroy();
         mLbmManager.unregisterReceiver(mUdpSendReceiver);
     }

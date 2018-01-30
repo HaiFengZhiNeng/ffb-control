@@ -25,8 +25,7 @@ public class VersonUtil {
 
         try {
             PackageManager pm = context.getPackageManager();
-            pi = pm.getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_CONFIGURATIONS);
+            pi = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_CONFIGURATIONS);
 
             return pi;
         } catch (Exception e) {

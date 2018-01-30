@@ -6,6 +6,8 @@ import com.example.ffbclient.common.RobotType;
 import com.example.ffbclient.common.presenter.BasePresenter;
 import com.example.ffbclient.common.presenter.BaseView;
 
+import java.util.List;
+
 /**
  * Created by zhangyuanyuan on 2017/9/22.
  */

@@ -84,11 +84,17 @@ public class NetClient {
         });
     }
 
-    public void sendTextMessageByUdp(String msg){
+    public void sendTextMessageByUdp(String msg) {
         if (mSocketManager == null)
             mSocketManager = SocketManager.getInstance();
         mSocketManager.sendTextByUDP(msg);
     }
 
 
+    public void unRegisterUdpClient() {
+        if (mSocketManager != null) {
+            mSocketManager.unRegisterUdpClient();
+            mSocketManager = null;
+        }
+    }
 }

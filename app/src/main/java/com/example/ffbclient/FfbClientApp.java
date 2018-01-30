@@ -6,7 +6,6 @@ import android.support.multidex.MultiDexApplication;
 
 import com.example.ffbclient.common.lifecycle.Foreground;
 import com.example.ffbclient.dao.DBHelper;
-import com.example.ffbclient.db.base.BaseManager;
 import com.example.ffbclient.utils.AsimpleCache.UserInfoCache;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
@@ -52,7 +51,7 @@ public class FfbClientApp extends MultiDexApplication {
         //创建应用，每个应用都会有一个Appid，绑定对应的翻译服务实例，即可使用
         YouDaoApplication.init(this, getResources().getString(R.string.app_youdao_id));
 
-        BaseManager.initOpenHelper(this);
+//        BaseManager.initOpenHelper(this);
 
         udpConnect = false;
     }

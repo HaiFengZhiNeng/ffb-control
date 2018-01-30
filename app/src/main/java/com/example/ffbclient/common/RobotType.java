@@ -12,8 +12,7 @@ public enum  RobotType {
     SmartChat,//发言人
     Motion,//移动
     GETIP,
-    LocalVoice,
-    File,
-    Anwser
+    Anwser,
+    LocalVoice
 
 }

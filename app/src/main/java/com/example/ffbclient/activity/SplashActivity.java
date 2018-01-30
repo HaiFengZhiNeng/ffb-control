@@ -21,6 +21,7 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.ViewPropertyAnimation;
+import com.example.ffbclient.FfbClientApp;
 import com.example.ffbclient.R;
 import com.example.ffbclient.common.BaseActivity;
 import com.example.ffbclient.common.BaseHandler;
@@ -38,6 +39,7 @@ import com.example.ffbclient.model.UserInfo;
 import com.example.ffbclient.presenter.SplashPresenter;
 import com.example.ffbclient.presenter.ipresenter.SplashView;
 import com.example.ffbclient.utils.PermissionsChecker;
+import com.example.ffbclient.utils.PhoneUtil;
 import com.example.ffbclient.utils.VersonUtil;
 import com.seabreeze.log.Print;
 import com.tencent.TIMCallBack;
@@ -112,6 +114,8 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
         Constants.displayWidth = wm.getDefaultDisplay().getWidth();
         Constants.displayHeight = wm.getDefaultDisplay().getHeight();
 
+        Constants.IP = PhoneUtil.getWifiIP(FfbClientApp.getInstance());
+        Print.e(Constants.IP);
     }
 
     ViewPropertyAnimation.Animator animationObject = new ViewPropertyAnimation.Animator() {
@@ -177,7 +181,7 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
         }
     }
 
-     //含有全部的权限
+    //含有全部的权限
 
     private boolean hasAllPermissionsGranted(@NonNull int[] grantResults) {
         for (int grantResult : grantResults) {
@@ -203,7 +207,8 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
         });
 
         builder.setPositiveButton(R.string.settings, new DialogInterface.OnClickListener() {
-            @Override public void onClick(DialogInterface dialog, int which) {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
                 startAppSettings();
             }
         });
@@ -266,7 +271,7 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
 
     @Override
     public void handleMessage(Message msg) {
-        switch (msg.what){
+        switch (msg.what) {
             case REFRESH_COMPLETE:
                 finish();
                 break;
@@ -299,7 +304,7 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
 
     }
 
-    private void loginSDK(){
+    private void loginSDK() {
         ILiveLoginManager.getInstance().setUserStatusListener(new ILiveLoginManager.TILVBStatusListener() {
             @Override
             public void onForceOffline(int error, String message) {
@@ -308,24 +313,24 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
         });
         ILiveLoginManager.getInstance().iLiveLogin(UserInfo.getInstance().getIdentifier(), UserInfo.getInstance().getUserSig(),
                 new ILiveCallBack() {
-            @Override
-            public void onSuccess(Object data) {
-                Print.e("onSuccess");
-                //初始化程序后台后消息推送
-                PushUtil.getInstance();
-                //初始化消息监听
-                MessageEvent.getInstance();
+                    @Override
+                    public void onSuccess(Object data) {
+                        Print.e("onSuccess");
+                        //初始化程序后台后消息推送
+                        PushUtil.getInstance();
+                        //初始化消息监听
+                        MessageEvent.getInstance();
 
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
+                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
 
-            @Override
-            public void onError(String module, int errCode, String errMsg) {
-                Print.e("login failed:" + module+"|"+errCode+"|"+errMsg);
-            }
-        });
+                    @Override
+                    public void onError(String module, int errCode, String errMsg) {
+                        Print.e("login failed:" + module + "|" + errCode + "|" + errMsg);
+                    }
+                });
     }
 
 
@@ -345,7 +350,7 @@ public class SplashActivity extends BaseActivity implements SplashView, BaseHand
                 LoginBusiness.logout(new TIMCallBack() {
                     @Override
                     public void onError(int i, String s) {
-                        if (SplashActivity.this != null){
+                        if (SplashActivity.this != null) {
                             Print.e("退出登录失败，请稍后重试");
                         }
                     }

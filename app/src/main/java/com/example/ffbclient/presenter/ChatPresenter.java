@@ -339,8 +339,6 @@ public class ChatPresenter extends IChatPresenter implements Observer {
             @Override
             public void onSuccess() {
                 RobotBean robotBean = new RobotBean();
-                robotBean.setType(RobotType.File);
-                robotBean.setOrder(BitmapUtils.projectPath + fileElem.getFileName());
                 mChatView.parseCustomMsgcomplete(GsonUtil.GsonString(robotBean));
             }
         });

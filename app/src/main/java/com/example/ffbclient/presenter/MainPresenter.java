@@ -21,12 +21,10 @@ import com.example.ffbclient.asr.youdao.TranslateData;
 import com.example.ffbclient.asr.youdao.TranslateLanguage;
 import com.example.ffbclient.common.RobotType;
 import com.example.ffbclient.dao.DataBaseDao;
-import com.example.ffbclient.db.manager.VoiceDbManager;
 import com.example.ffbclient.listener.MyAiuiListener;
 import com.example.ffbclient.listener.MyRecognizerListener;
 import com.example.ffbclient.listener.MySynthesizerListener;
 import com.example.ffbclient.model.InterfaceBean;
-import com.example.ffbclient.model.VoiceBean;
 import com.example.ffbclient.presenter.ipresenter.IMainPresenter;
 import com.example.ffbclient.ui.InterfaceDialog;
 import com.example.ffbclient.ui.NavController;
@@ -404,15 +402,6 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
         }
         sceneDialog.setClickListener(clickListenerInterface);
         sceneDialog.show();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //获取data数据
-                VoiceDbManager dbManager = new VoiceDbManager();
-                List<VoiceBean> voiceBeanList = dbManager.loadAll();
-                sceneDialog.setData(voiceBeanList);
-            }
-        }).start();
     }
 
     @Override
@@ -787,49 +776,16 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
     private ClickListenerInterface clickListenerInterface = new ClickListenerInterface() {
         @Override
         public void sendInterface(int id) {
-            //界面控制
-//            interfaceBytes = new byte[7];
-//            interfaceBytes[0] = (byte) 0xAA;
-//            interfaceBytes[1] = (byte) 0x02;
-//            interfaceBytes[2] = (byte) ((id & 0xff00) >> 8);//高位
-//            interfaceBytes[3] = (byte) (id & 0xff);//低位
-//            interfaceBytes[5] = (byte) (interfaceBytes[1] ^ interfaceBytes[2] ^ interfaceBytes[3] ^ interfaceBytes[4]);
-//            interfaceBytes[6] = (byte) 0xBB;
-//            isInterface = true;
             mView.SendRobot("点击了界面控制的单项", RobotType.Text);
         }
 
         @Override
-        public void sendScene(long id) {
-            //情景 DIY
-//            controlBytes[3] |= (byte) (id << 3) | (controlBytes[3] & 0x07);
-//            if (id == 1) {
-//                mView.SendRobot("你也好啊，哈哈", RobotType.Text);
-//            } else if (id == 2) {
-//                mView.SendRobot("我今年十八", RobotType.Text);
-//            } else {
-//                mView.SendRobot("海风智能科技是一家集人工智能和机器人产品研发、设计、生产及销售为一体的创新型高新技术企业。作为中国智能机器人市场的先行者，海风智能科技秉承引领未来智能生活的理念，致力于打破传统模式与新兴技术间的壁垒，贴近现实场景，满足用户需求，拉近智能机器人与实际应用的距离，与大家一起分享智能科技服务生活的便利。",
-//                        RobotType.Text);
-//            }
-
-            VoiceDbManager dbManager = new VoiceDbManager();
-            List<VoiceBean> voiceBeenList = dbManager.queryVoiceById(id);
-            if (voiceBeenList != null) {
-                VoiceBean voiceBean = voiceBeenList.get(0);
-                mView.SendRobot(voiceBean.getVoiceAnswer(), RobotType.Anwser);
-            }
+        public void sendScene(String anwer) {
+            mView.SendRobot(anwer, RobotType.Anwser);
         }
 
         @Override
         public void sendRefreshData() {
-            //发送获取界面数据
-//            been = new ArrayList<>();
-//            stringBuffer = new StringBuffer();
-//            getDataBytes = new byte[3];
-//            getDataBytes[0] = (byte) 0xAA;
-//            getDataBytes[1] = (byte) 0x03;
-//            getDataBytes[2] = (byte) 0xBB;
-//            isGetData = true;
         }
 
         @Override
@@ -930,7 +886,7 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
 
     @Override
     public void onNavAndSpeed(int nav) {
-        if(mNav != nav){
+        if (mNav != nav) {
             isTouch = false;
             myHandler.removeMessages(2);
         }
@@ -1112,7 +1068,7 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
     public interface ClickListenerInterface {
         void sendInterface(int id);
 
-        void sendScene(long id);
+        void sendScene(String anwer);
 
         void sendRefreshData();
 

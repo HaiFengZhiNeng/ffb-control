@@ -18,11 +18,12 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.ffbclient.R;
-import com.example.ffbclient.model.VoiceBean;
 import com.example.ffbclient.presenter.MainPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.ffbclient.activity.MainActivity.localVoices;
 
 /**
  * Created by zhangyuanyuan on 2017/10/10.
@@ -36,7 +37,6 @@ public class SceneDialog implements DialogInterface.OnDismissListener, AdapterVi
     private View customview;
     private MainPresenter.ClickListenerInterface clickListener;
 
-    private List<VoiceBean> localVoiceList = new ArrayList<>();
 
     /**
      * Dialog主题
@@ -49,8 +49,8 @@ public class SceneDialog implements DialogInterface.OnDismissListener, AdapterVi
     }
 
     public SceneDialog(Context context, String title) {
-        mContext = context;
-        mtitle = title;
+        this.mContext = context;
+        this.mtitle = title;
         this.theme = R.style.NewSettingDialog;
     }
 
@@ -97,34 +97,21 @@ public class SceneDialog implements DialogInterface.OnDismissListener, AdapterVi
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (clickListener != null)
-            clickListener.sendScene(localVoiceList.get(position).getId());
+            clickListener.sendScene(localVoices.get(position));
 
         dismiss();
     }
 
-    public void setData(List<VoiceBean> voiceBeanList) {
-        localVoiceList = voiceBeanList;
-        if (adapter != null)
-            adapter.setBeen(voiceBeanList);
-    }
-
     private class InterfaceAdapter extends BaseAdapter {
-
-        List<VoiceBean> been = null;
-
-        public void setBeen(List<VoiceBean> been) {
-            this.been = been;
-            notifyDataSetChanged();
-        }
 
         @Override
         public int getCount() {
-            return been != null ? been.size() : 0;
+            return localVoices != null ? localVoices.size() : 0;
         }
 
         @Override
         public Object getItem(int position) {
-            return been != null ? been.get(position) : null;
+            return localVoices != null ? localVoices.get(position) : null;
         }
 
         @Override
@@ -146,7 +133,7 @@ public class SceneDialog implements DialogInterface.OnDismissListener, AdapterVi
                 vh = (ViewHolder) convertView.getTag();
             }
             vh.tv.setText((position + 1) + " 、 ");
-            vh.scene_item.setText(been.get(position).getVoiceQuestion() + "");
+            vh.scene_item.setText(localVoices.get(position));
             return convertView;
         }
 

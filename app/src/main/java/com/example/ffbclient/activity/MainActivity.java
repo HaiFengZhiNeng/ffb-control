@@ -24,9 +24,7 @@ import com.example.ffbclient.common.Constants;
 import com.example.ffbclient.common.IMBaseActivity;
 import com.example.ffbclient.common.RobotType;
 import com.example.ffbclient.common.UserManage;
-import com.example.ffbclient.db.manager.VoiceDbManager;
 import com.example.ffbclient.model.RobotBean;
-import com.example.ffbclient.model.VoiceBean;
 import com.example.ffbclient.presenter.ChatPresenter;
 import com.example.ffbclient.presenter.MainPresenter;
 import com.example.ffbclient.presenter.ipresenter.IChatPresenter;
@@ -57,6 +55,7 @@ import com.tencent.ilivesdk.view.AVVideoView;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -152,8 +151,9 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
 
     private SweetAlertDialog mDialog;
 
-    private VoiceDbManager mVoiceDbManager;
     private boolean quit = false; //设置退出标识
+
+    public static List<String> localVoices;
 
     @Override
     protected void onResume() {
@@ -176,6 +176,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     protected void onDestroy() {
         ILVCallManager.getInstance().removeCallListener(this);
         ILVCallManager.getInstance().onDestory();
+        stopService(new Intent(this, UdpService.class));
         mChatPresenter.finish();
         super.onDestroy();
         mLbmManager.unregisterReceiver(mUdpAcceptReceiver);
@@ -197,8 +198,6 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         mChatPresenter = new ChatPresenter(this, TIMConversationType.C2C, UserManage.getInstance().getRobotName());
         mChatPresenter.start();
 
-        Constants.IP = PhoneUtil.getWifiIP(FfbClientApp.getInstance());
-
         ILVCallManager.getInstance().init(new ILVCallConfig()
                 .setNotificationListener(this)
                 .setAutoBusy(true));
@@ -217,20 +216,17 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         mChronometer.stop();
         mChronometer.setVisibility(View.GONE);
 
-        mVoiceDbManager = new VoiceDbManager();
-
         mLbmManager = LocalBroadcastManager.getInstance(this);
         SendRobot(Constants.IP, RobotType.GETIP);
         mConnetState.setVisibility(View.VISIBLE);
-
-        int currentVersion = PreferencesUtils.getInt(this, "LocalVoice", -1);
-        SendRobot(String.valueOf(currentVersion), RobotType.LocalVoice);
 
     }
 
     @Override
     protected void initData() {
-
+        if (localVoices != null) {
+            localVoices.clear();
+        }
     }
 
     @Override
@@ -277,7 +273,11 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                 mPresenter.sendSpeech();
                 break;
             case R.id.like_imageView:
-                mPresenter.showSceneDialog();
+                if (localVoices == null || localVoices.size() == 0) {
+                    SendRobot("GetLocalVoice", RobotType.LocalVoice);
+                } else {
+                    mPresenter.showSceneDialog();
+                }
                 break;
             case R.id.send_text:
                 mPresenter.sendAIUIText();
@@ -601,26 +601,18 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                     FfbClientApp.getInstance().setUdpConnect(false);
                     return;
                 }
+                mConnetState.setText("已连接");
                 Intent intent = new Intent(this, UdpService.class);
                 startService(intent);
                 FfbClientApp.getInstance().setUdpConnect(true);
-                mConnetState.setText("已连接");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         } else if (robotType == RobotType.LocalVoice) {
-            int localVersion = Integer.valueOf(bean.getOrder());
-            PreferencesUtils.putInt(this, "LocalVoice", localVersion);
-        } else if (robotType == RobotType.File) {
-            mVoiceDbManager.deleteAll();
-            String content = FileUtil.read(MainActivity.this, BitmapUtils.projectPath + "voiceBean.txt");
-            if (content != null) {
-                List<VoiceBean> voiceList = GsonUtil.GsonToArrayList(content, VoiceBean.class);
-                if (voiceList != null && voiceList.size() > 0) {
-                    mVoiceDbManager.insertList(voiceList);
-                }
-            }
+            String localVoice = bean.getOrder();
+            List<String> voices = GsonUtil.GsonToList(localVoice, String.class);
+            localVoices = voices;
+            mPresenter.showSceneDialog();
         }
     }
 

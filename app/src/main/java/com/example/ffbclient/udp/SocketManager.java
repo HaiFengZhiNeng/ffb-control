@@ -58,7 +58,7 @@ public class SocketManager {
      * 无参数的构造函数
      */
     private SocketManager() {
-        if(Constants.IP == null){
+        if (Constants.IP == null) {
             throw new RuntimeException("ip is null");
         }
     }
@@ -171,7 +171,7 @@ public class SocketManager {
     /**
      * 通过UDP发送文本
      *
-     * @param msg      发送的字符串
+     * @param msg 发送的字符串
      */
     public void sendTextByUDP(String msg) {
         try {
@@ -197,4 +197,9 @@ public class SocketManager {
         }
     }
 
+    public void unRegisterUdpClient() {
+        if (mDatagramSocket != null) {
+            mDatagramSocket = null;
+        }
+    }
 }
