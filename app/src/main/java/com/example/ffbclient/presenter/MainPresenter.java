@@ -162,21 +162,36 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case 1:
+
                     break;
+
                 case 2:
                     if (isTouch) {
+
                         if (!TextUtils.isEmpty(code))
                             mView.SendRobot(code, RobotType.Motion);
-                        myHandler.sendEmptyMessageDelayed(2, 500);
+
+                        myHandler.sendEmptyMessageDelayed(2, 200);
                     }
+                    //  myHandler.sendEmptyMessage(2);
                     break;
                 case 3:
 
+
                     if (!TextUtils.isEmpty(code))
                         mView.SendRobot(code, RobotType.Motion);
-                    myHandler.sendEmptyMessage(2);
+
+                    myHandler.sendEmptyMessageDelayed(2, 1000);
                     code = "";
                     myHandler.removeMessages(2);
+                    myHandler.removeMessages(4);
+                    isTouch = false;
+                    break;
+                case 4:
+                    if (!TextUtils.isEmpty(code))
+
+                    mView.SendRobot(code, RobotType.Motion);
+                    myHandler.sendEmptyMessageDelayed(4, 200);
                     break;
             }
             super.handleMessage(msg);
@@ -890,52 +905,44 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
             isTouch = false;
             myHandler.removeMessages(2);
         }
-
         if (!isTouch) {
 
             isTouch = true;
             mNav = nav;
-            switch (nav) {
-                case 7:
-//                mView.SendRobot( "A5038002AA", RobotType.Motion);
-                    code = "A5038002AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 6:
-                    code = "A5038003AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 5:
-                    code = "A5038006AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 4:
-                    code = "A5038009AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 3:
-                    code = "A5038008AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 2:
-                    code = "A5038007AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 1:
-                    code = "A5038004AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 0:
-                    code = "A5038001AA";
-                    myHandler.sendEmptyMessage(2);
-                    break;
-                case 9:
-                    code = "A5038005AA";
-                    myHandler.sendEmptyMessage(3);
-                    break;
+            if (nav == 5) {
+                code = "A5038006AA";//右
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 3) {
+                code = "A5038008AA";//下
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 7) {
+                code = "A5038002AA";//上
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 1) {
+                code = "A5038004AA";//左
+                myHandler.sendEmptyMessage(2);
+            }
 
-                default:
-                    break;
+
+            else if (nav == 4) {
+                code = "A5038009AA";//右下
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 6) {
+                code = "A5038003AA";//右上
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 2) {
+                code = "A5038007AA";//左下
+                myHandler.sendEmptyMessage(2);
+            } else if (nav == 0) {
+                code = "A5038001AA";//左上
+                myHandler.sendEmptyMessage(2);
+            }
+
+
+
+            else {
+                code = "5";//停
+                myHandler.sendEmptyMessage(3);
             }
         }
     }
@@ -943,8 +950,9 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
     @Override
     public void onTouchDown() {
         isTouch = false;
+        myHandler.removeMessages(2);
 //        sendTextToByte("Motion", "A5038005AA");
-        mView.SendRobot("A5038002AA", RobotType.Motion);
+//        mView.SendRobot("A5038002AA", RobotType.Motion);
     }
 
     /**

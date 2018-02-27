@@ -18,6 +18,7 @@ import com.example.ffbclient.presenter.ipresenter.IMainPresenter;
  */
 
 public class NavController extends View {
+
     private int innerColor;
     private int outerColor;
     private final static int INNER_COLOR_DEFAULT = Color.parseColor("#66838383");//d32f2f
@@ -113,11 +114,10 @@ public class NavController extends View {
         }
         if (event.getAction() == MotionEvent.ACTION_MOVE) {
             changeInnerCirclePosition(event);
-            Log.i("TAG", "MOVED");
         }
         if (event.getAction() == MotionEvent.ACTION_UP) {
-//            mView.SendRobot( "A5038005AA", RobotType.Motion);
-
+            Log.i("LYW", "停止：" );
+            //  sendToRobot.SendRobot("A5038005AA","Motion" );
             centerX = originalX;
             centerY = originalY;
             innerCenterX = originalX;
@@ -184,7 +184,8 @@ public class NavController extends View {
         float aY = (Y - centerY);
         float angle = (float) Math.atan2(Math.abs(aY), Math.abs((aX)));
 
-//        int direction = 0;//1、上；2下；3、左；4、右；5、左上；6、左下；7、右上；8、右下
+        //     int direction = 0;//
+
 
         if (aX > 0 && aY >= 0) {
 //            360-0  第四象限
@@ -266,6 +267,7 @@ public class NavController extends View {
 
 //        Print.e("XY", "   X:" + aX + "    Y:" + aY + "   angle:" + angle + "   direction:" + direction);
 
+
         //两种情况：小圆半径
         boolean isPointInFree = Math.pow(X - centerX, 2) + Math.pow(Y - centerY, 2) <= Math.pow(outRadius - innerRedius, 2);
         if (isPointInFree) {
@@ -287,17 +289,22 @@ public class NavController extends View {
             if (X >= centerX && Y >= centerY) {//下
                 innerCenterX = centerX + limitCircleTriX;
                 innerCenterY = centerY + limitCircleTriY;
+
             } else if (X < centerX && Y >= centerY) {//左
                 innerCenterX = centerX - limitCircleTriX;
                 innerCenterY = centerY + limitCircleTriY;
+
             } else if (X >= centerX && Y < centerY) {//右
                 innerCenterX = centerX + limitCircleTriX;
                 innerCenterY = centerY - limitCircleTriY;
+
             } else {//上
                 innerCenterX = centerX - limitCircleTriX;
                 innerCenterY = centerY - limitCircleTriY;
+
             }
 
+            Log.i("TAG", "inLimit");
         }
         invalidate();
         /*} else {
@@ -313,4 +320,7 @@ public class NavController extends View {
         final float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
     }
+
+
+
 }
