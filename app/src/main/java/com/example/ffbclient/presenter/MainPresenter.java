@@ -357,7 +357,7 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
             mView.SendRobot("A503800AAA", RobotType.Motion);
             data = "自由运动(开)";
             mView.setSportVisiable(false);
-            mHandler.postDelayed(runnable, 600);
+            mHandler.postDelayed(runnable, 200);
         }
 //        mView.setAutoText(data);
         isAutoAction = !isAutoAction;
