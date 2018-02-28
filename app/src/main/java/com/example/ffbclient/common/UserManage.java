@@ -9,8 +9,8 @@ public class UserManage {
 
     public static final String roomAVId = "@TGS#2GOCMM6EN";
 
-    public static String robotName001 = "hotel001";
-    public static String robotName002 = "hotel002";
+    public static String robotName001 = "fanf102";
+    public static String robotName002 = "fanf105";
 
     private volatile static UserManage userManage;
 

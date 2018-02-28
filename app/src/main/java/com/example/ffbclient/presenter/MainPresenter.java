@@ -76,8 +76,6 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
 
     private IMainView mView;
 
-    private int mCallId;
-
 
     //    private CustomControl customControl;
     //    private NlpControl nlpControl;
@@ -317,29 +315,6 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
     }
 
     @Override
-    public void makeCall() {
-        mView.setGlViewVisable(true);
-        mView.setBottomVisible(false);
-
-        ILVCallOption option = new ILVCallOption(ILiveLoginManager.getInstance().getMyUserId())
-                .callTips("CallSDK Demo")
-                .setMemberListener(this)
-                .setCallType(ILVCallConstants.CALL_TYPE_VIDEO);
-        if (0 == mCallId) { // 发起呼叫
-            ArrayList<String> nums = new ArrayList<String>();
-            nums.add("zhangT");
-
-            if (nums.size() > 1) {
-                mCallId = ILVCallManager.getInstance().makeMutiCall(nums, option);
-            } else {
-                mCallId = ILVCallManager.getInstance().makeCall(nums.get(0), option);
-            }
-        } else {  // 接听呼叫
-            ILVCallManager.getInstance().acceptCall(mCallId, option);
-        }
-    }
-
-    @Override
     public void sendAutoAction() {
         //    mView.SendRobot("自由运动", RobotType.AutoAction);
         String data;
@@ -492,17 +467,6 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
             mView.setLocalViewVisiable(false);
         }
         isVisiable = !isVisiable;
-    }
-
-    @Override
-    public void onRefuse() {
-        //拒绝呼入
-//        if (!TextUtils.isEmpty(mCurrentCallId)) {
-//            ECDevice.getECVoIPCallManager().rejectCall(mCurrentCallId, 6666);
-//        }
-        ILVCallManager.getInstance().endCall(mCallId);
-        mView.setGlViewVisable(false);
-        mView.setRefuseVisable(true);
     }
 
     @Override
@@ -762,10 +726,6 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
             initAiui();
             aiuiWriteText(text);
         }
-    }
-
-    public int getmCallId() {
-        return mCallId;
     }
 
     @Override

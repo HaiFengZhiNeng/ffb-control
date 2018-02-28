@@ -22,8 +22,6 @@ public abstract class IMainPresenter implements BasePresenter {
 
     public abstract void reLink();
 
-    public abstract void makeCall();
-
     public abstract void sendAutoAction();
 
     public abstract void showInterfaceDialog();
@@ -41,8 +39,6 @@ public abstract class IMainPresenter implements BasePresenter {
     public abstract void audioPermission();
 
     public abstract void localViewVisible();
-
-    public abstract void onRefuse();
 
     public abstract void onAccept();
 

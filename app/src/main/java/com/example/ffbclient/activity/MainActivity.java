@@ -41,14 +41,19 @@ import com.example.ffbclient.utils.PreferencesUtils;
 import com.seabreeze.log.Print;
 import com.tencent.TIMConversationType;
 import com.tencent.TIMMessage;
+import com.tencent.av.sdk.AVAudioCtrl;
+import com.tencent.callsdk.ILVBCallMemberListener;
 import com.tencent.callsdk.ILVCallConfig;
+import com.tencent.callsdk.ILVCallConstants;
 import com.tencent.callsdk.ILVCallListener;
 import com.tencent.callsdk.ILVCallManager;
 import com.tencent.callsdk.ILVCallNotification;
 import com.tencent.callsdk.ILVCallNotificationListener;
+import com.tencent.callsdk.ILVCallOption;
 import com.tencent.callsdk.ILVIncomingListener;
 import com.tencent.callsdk.ILVIncomingNotification;
 import com.tencent.ilivesdk.ILiveConstants;
+import com.tencent.ilivesdk.ILiveSDK;
 import com.tencent.ilivesdk.core.ILiveLoginManager;
 import com.tencent.ilivesdk.view.AVRootView;
 import com.tencent.ilivesdk.view.AVVideoView;
@@ -69,7 +74,7 @@ import cn.pedant.SweetAlert.SweetAlertDialog;
  */
 
 public class MainActivity extends IMBaseActivity implements IMainPresenter.IMainView, ILVCallListener, ILVIncomingListener,
-        ILVCallNotificationListener, IChatPresenter.IChatView, UDPAcceptReceiver.UDPAcceptInterface {
+        ILVCallNotificationListener, IChatPresenter.IChatView, UDPAcceptReceiver.UDPAcceptInterface, ILVBCallMemberListener {
 
 
     @BindView(R.id.nav_control)
@@ -174,12 +179,20 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
 
     @Override
     protected void onDestroy() {
+        endCall();
         ILVCallManager.getInstance().removeCallListener(this);
         ILVCallManager.getInstance().onDestory();
         stopService(new Intent(this, UdpService.class));
         mChatPresenter.finish();
         super.onDestroy();
         mLbmManager.unregisterReceiver(mUdpAcceptReceiver);
+    }
+
+    private void endCall() {
+        if(mCallId != -1) {
+            ILVCallManager.getInstance().endCall(mCallId);
+            mCallId = -1;
+        }
     }
 
     @Override
@@ -208,10 +221,11 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         ILiveLoginManager.getInstance().setUserStatusListener(new ILiveLoginManager.TILVBStatusListener() {
             @Override
             public void onForceOffline(int error, String message) {
-                finish();
+                setGlViewVisable(false);
+                setRefuseVisable(false);
+                isCalling = false;
             }
         });
-        ILVCallManager.getInstance().initAvView(avRootView);
 
         mChronometer.stop();
         mChronometer.setVisibility(View.GONE);
@@ -237,7 +251,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     @Override
     public void onBackPressed() {
         //结束呼叫
-        ILVCallManager.getInstance().endCall(mPresenter.getmCallId());
+        endCall();
         if (!quit) { //询问退出程序
             showToast("再按一次退出程序");
             new Timer(true).schedule(new TimerTask() { //启动定时任务
@@ -298,7 +312,9 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                 mPresenter.localViewVisible();
                 break;
             case R.id.btn_cancel_video:
-                mPresenter.onRefuse();
+                endCall();
+                setGlViewVisable(false);
+                setRefuseVisable(false);
                 break;
             case R.id.video_btn_accept:
 //                mPresenter.attachGlView(mLocalVideoView, mRemoteVideoView);
@@ -308,7 +324,29 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                 mPresenter.onHangUp();
                 break;
             case R.id.openSurface_imageView:
-                mPresenter.makeCall();
+                if (isCalling) {
+                    return;
+                }
+                isCalling = true;
+                setGlViewVisable(true);
+                setRefuseVisable(true);
+                ILVCallOption option = new ILVCallOption(ILiveLoginManager.getInstance().getMyUserId())
+                        .callTips("CallSDK Demo")
+                        .setMemberListener(this)
+                        .setCallType(ILVCallConstants.CALL_TYPE_VIDEO);
+                if (-1 == mCallId) { // 发起呼叫
+                    ArrayList<String> nums = new ArrayList<String>();
+                    nums.add(UserManage.robotName001);
+
+                    if (nums.size() > 1) {
+                        mCallId = ILVCallManager.getInstance().makeMutiCall(nums, option);
+                    } else {
+                        mCallId = ILVCallManager.getInstance().makeCall(nums.get(0), option);
+                    }
+                    ILVCallManager.getInstance().initAvView(avRootView);
+                } else {  // 接听呼叫
+//                    ILVCallManager.getInstance().acceptCall(mCallId, option);
+                }
                 break;
             case R.id.controlSetting_imageView:
                 mPresenter.showControl(mControlRelative);
@@ -454,7 +492,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
 
     @Override
     public void setRefuseVisable(boolean b) {
-        mReleaseLayout.setVisibility(b ? View.GONE : View.VISIBLE);//结束(呼出)
+        mReleaseLayout.setVisibility(b ? View.VISIBLE : View.GONE);//结束(呼出)
     }
 
     @Override
@@ -501,11 +539,9 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
 
     @Override
     public void onCallEstablish(int callId) {
-//        btnEnd.setVisibility(View.VISIBLE);
-
-        Log.d("ILVB-DBG", "onCallEstablish->0:" + avRootView.getViewByIndex(0).getIdentifier() + "/" + avRootView.getViewByIndex(1).getIdentifier());
+        Print.e("onCallEstablish");
+        initCallManager();
         avRootView.swapVideoView(0, 1);
-        // 设置点击小屏切换及可拖动
         for (int i = 1; i < ILiveConstants.MAX_AV_VIDEO_NUM; i++) {
             final int index = i;
             AVVideoView minorView = avRootView.getViewByIndex(i);
@@ -523,6 +559,29 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         }
     }
 
+    private int mCurCameraId = ILiveConstants.BACK_CAMERA;
+
+    private void initCallManager() {
+        //打开摄像头
+        ILVCallManager.getInstance().enableCamera(mCurCameraId, true);
+        //关闭摄像头
+//        ILVCallManager.getInstance().enableCamera(mCurCameraId, false);
+//        avRootView.closeUserView(ILiveLoginManager.getInstance().getMyUserId(), AVView.VIDEO_SRC_TYPE_CAMERA, true);
+        //切换摄像头
+//        mCurCameraId = (ILiveConstants.FRONT_CAMERA==mCurCameraId) ? ILiveConstants.BACK_CAMERA : ILiveConstants.FRONT_CAMERA;
+        ILVCallManager.getInstance().switchCamera(mCurCameraId);
+        //打开麦克风
+        ILVCallManager.getInstance().enableMic(true);
+        //关闭麦克风
+//        ILVCallManager.getInstance().enableMic(false);
+        //切换到听筒
+//        ILiveSDK.getInstance().getAvAudioCtrl().setAudioOutputMode(AVAudioCtrl.OUTPUT_MODE_HEADSET);
+        //切换到扬声器
+        ILiveSDK.getInstance().getAvAudioCtrl().setAudioOutputMode(AVAudioCtrl.OUTPUT_MODE_SPEAKER);
+        //设置美艳
+        ILiveSDK.getInstance().getAvVideoCtrl().inputBeautyParam(0.0f);
+    }
+
     /**
      * 会话结束回调
      *
@@ -532,12 +591,16 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
      */
     @Override
     public void onCallEnd(int callId, int endResult, String endInfo) {
+        setGlViewVisable(false);
+        setRefuseVisable(false);
+        isCalling = false;
         Print.e("XDBG_END", "onCallEnd->id: " + callId + "|" + endResult + "|" + endInfo);
     }
 
     @Override
     public void onException(int iExceptionId, int errCode, String errMsg) {
-
+        Print.e("XDBG_END", "onCallEnd->id: " + iExceptionId + "|" + errCode + "|" + errMsg);
+        isCalling = false;
     }
 
 
@@ -547,9 +610,35 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                 " | " + ilvCallNotification.getUserInfo() + "/" + ilvCallNotification.getSender());
     }
 
+    private boolean isCalling;
+    private int mCallId;
+
     @Override
     public void onNewIncomingCall(int callId, int callType, ILVIncomingNotification notification) {
+        if (isCalling) {
+            return;
+        }
+        isCalling = true;
+        mCallId = callId;
+        setGlViewVisable(true);
+        setRefuseVisable(true);
+        ILVCallOption ilvCallOption = new ILVCallOption(notification.getSender())
+                .callTips("呼叫标题")
+                .setMemberListener(this)
+                .setCallType(callType);
+        ILVCallManager.getInstance().initAvView(avRootView);
+        ILVCallManager.getInstance().acceptCall(callId, ilvCallOption);
+    }
 
+    //设置成员事件回调(调用ILVCallManager中的摄像头及麦克风接口才会有事件)
+    @Override
+    public void onCameraEvent(String id, boolean bEnable) {
+        Print.e("onCameraEvent");
+    }
+
+    @Override
+    public void onMicEvent(String id, boolean bEnable) {
+        Print.e("onMicEvent");
     }
 
     @Override
