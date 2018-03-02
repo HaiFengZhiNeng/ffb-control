@@ -311,7 +311,8 @@ public class MainPresenter extends IMainPresenter implements ILVBCallMemberListe
 
     @Override
     public void reLink() {
-        mView.showMsg("当前未连接机器人");
+        mView.SendRobot("A50C82E5AA", RobotType.Motion);
+      //  mView.showMsg("当前未连接机器人");
     }
 
     @Override
