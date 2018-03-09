@@ -3,9 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://E:\AndroidStudio\workspace\FanFan\ffb-control180131\ffb-control.iml" filepath="E:\AndroidStudio\workspace\FanFan\ffb-control180131\ffb-control.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ffb-control.iml" filepath="$PROJECT_DIR$/ffb-control.iml" />
       <module fileurl="file://$PROJECT_DIR$/print/print.iml" filepath="$PROJECT_DIR$/print/print.iml" />
-      <module fileurl="file://$PROJECT_DIR$/qqqq.iml" filepath="$PROJECT_DIR$/qqqq.iml" />
     </modules>
   </component>
 </project>

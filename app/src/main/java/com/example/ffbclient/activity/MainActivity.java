@@ -336,7 +336,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
                         .setCallType(ILVCallConstants.CALL_TYPE_VIDEO);
                 if (-1 == mCallId) { // 发起呼叫
                     ArrayList<String> nums = new ArrayList<String>();
-                    nums.add(UserManage.robotName001);
+                    nums.add(UserManage.getInstance().getRobotName());
 
                     if (nums.size() > 1) {
                         mCallId = ILVCallManager.getInstance().makeMutiCall(nums, option);
@@ -611,7 +611,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     }
 
     private boolean isCalling;
-    private int mCallId;
+    private int mCallId = -1;
 
     @Override
     public void onNewIncomingCall(int callId, int callType, ILVIncomingNotification notification) {
