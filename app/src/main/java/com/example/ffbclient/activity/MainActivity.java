@@ -189,7 +189,8 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     }
 
     private void endCall() {
-        if(mCallId != -1) {
+        isCalling = false;
+        if (mCallId != -1) {
             ILVCallManager.getInstance().endCall(mCallId);
             mCallId = -1;
         }
@@ -559,7 +560,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         }
     }
 
-    private int mCurCameraId = ILiveConstants.BACK_CAMERA;
+    private int mCurCameraId = ILiveConstants.FRONT_CAMERA;
 
     private void initCallManager() {
         //打开摄像头
@@ -614,7 +615,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
     private int mCallId = -1;
 
     @Override
-    public void onNewIncomingCall(int callId, int callType, ILVIncomingNotification notification) {
+    public void onNewIncomingCall(final int callId, int callType, ILVIncomingNotification notification) {
         if (isCalling) {
             return;
         }
@@ -622,7 +623,7 @@ public class MainActivity extends IMBaseActivity implements IMainPresenter.IMain
         mCallId = callId;
         setGlViewVisable(true);
         setRefuseVisable(true);
-        ILVCallOption ilvCallOption = new ILVCallOption(notification.getSender())
+        final ILVCallOption ilvCallOption = new ILVCallOption(notification.getSender())
                 .callTips("呼叫标题")
                 .setMemberListener(this)
                 .setCallType(callType);
